@@ -5,14 +5,15 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
+        android:background="@color/black"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MediaActivity">
+        tools:context=".MediaPlayerActivity">
 
         <androidx.media3.ui.PlayerView
             android:id="@+id/mPlayer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
