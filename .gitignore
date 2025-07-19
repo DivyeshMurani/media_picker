@@ -1,0 +1,54 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Ignore unit tests (if not used)
+**/src/test/
+
+.idea/
+.gradle/
+
+build/
+captures/
+.externalNativeBuild/
+
+# Keystore files
+*.jks
+*.keystore
+
+# Log files
+*.log
+
+# Mac OS
+.DS_Store
+
+# Kotlin
+*.class
+
+# APK/Build output
+*.apk
+*.ap_
+*.dex
+*.aar
+
+# Cache
+.cxx/
+*.cxx/
+
+# Generated folders
+app/build/
+**/build/
+
+app/src/test/java/com.io.media.ExampleUnitTest
