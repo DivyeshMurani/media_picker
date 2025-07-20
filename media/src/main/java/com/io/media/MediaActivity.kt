@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.DiffUtil
@@ -96,6 +97,9 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+            }else{
+                initLoadMedia()
+
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(
@@ -109,6 +113,8 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
                         android.Manifest.permission.READ_MEDIA_VIDEO
                     ), 1
                 )
+            }else{
+                initLoadMedia()
             }
         }
     }
@@ -158,7 +164,7 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
 
 
         // Initial load
-        initLoadMedia()
+//        initLoadMedia()
 
     }
 
@@ -332,6 +338,27 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
                     }).into(image)
             }
         }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String?>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == 1) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initLoadMedia()
+            }else{
+
+                Toast.makeText(this@MediaActivity, "Permission denied", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+
+        }
+
+
     }
 
     override fun onDestroy() {
