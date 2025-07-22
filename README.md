@@ -4,11 +4,17 @@ A lightweight and easy-to-use Android library for selecting images and videos (s
 
 🎥 Features:
 ✅ Pick single/multiple images
+
 ✅ Pick single/multiple videos
+
 ✅ Video playback preview
+
 ✅ Image/video file path access
+
 ✅ Modern Material UI
+
 ✅ Supports runtime permissions
+
 ✅ Android API 16–34+ supported
 
 💻Usage
