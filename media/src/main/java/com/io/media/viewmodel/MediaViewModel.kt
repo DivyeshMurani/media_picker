@@ -17,11 +17,15 @@ class MediaViewModel : ViewModel() {
     val liveOfTotalPage = MutableSharedFlow<Int>(1)
     val hadShowFab = MutableLiveData<Int>(0)
     var mediaMaxSelect = 1
+    var mediaExtension = ""
 
 
     fun getImagesWithPaths(
-        contentResolver: ContentResolver, offset: Int, limit: Int, type: Int = 1
+        contentResolver: ContentResolver, offset: Int, limit: Int, type: Int = 1,
+        format: String?=null
     ) {
+
+        Log.d("developer","format :$format")
 
         val arrayOfMedia = ArrayList<MediaModel>()
         val imagesUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -33,8 +37,29 @@ class MediaViewModel : ViewModel() {
             MediaStore.Images.Media.SIZE
         )
 
+        val selectionBuilder = StringBuilder("${MediaStore.Images.Media.SIZE} > 0")
+        val selectionArgs = mutableListOf<String>()
+
+        if (format != null) {
+            when (format.lowercase()) {
+                "jpg", "jpeg" -> {
+                    selectionBuilder.append(" AND ${MediaStore.Images.Media.MIME_TYPE}=?")
+                    selectionArgs.add("image/jpeg")
+                }
+                "png" -> {
+                    selectionBuilder.append(" AND ${MediaStore.Images.Media.MIME_TYPE}=?")
+                    selectionArgs.add("image/png")
+                }
+            }
+        }
+
+        Log.d("developer","${selectionArgs.toString()}")
+
+
+
         // Add selection to filter out invalid images
-        val selection = "${MediaStore.Images.Media.SIZE} > 0"
+//        val selection = "${MediaStore.Images.Media.SIZE} > 0"
+        val selection = selectionBuilder.toString()
 
 
         // Sort by date, but remove the LIMIT/OFFSET
@@ -42,7 +67,7 @@ class MediaViewModel : ViewModel() {
 
         try {
             contentResolver.query(
-                imagesUri, projection, selection, null, sortOrder
+                imagesUri, projection, selection, if (selectionArgs.isEmpty()) null else selectionArgs.toTypedArray(), sortOrder
             )?.use { cursor ->
 
                 Log.e("developer", "cursor.count :: ${cursor.count}")
@@ -98,6 +123,8 @@ class MediaViewModel : ViewModel() {
         }
     }
 
+
+
     fun getVideosWithPaths(
         contentResolver: ContentResolver, offset: Int, limit: Int
     ) {
@@ -113,6 +140,11 @@ class MediaViewModel : ViewModel() {
             MediaStore.Video.Media.RESOLUTION,
             MediaStore.Video.Media.TITLE
         )
+
+
+
+
+
 
         val selection = "${MediaStore.Video.Media.SIZE} > 0"
         val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
@@ -165,6 +197,119 @@ class MediaViewModel : ViewModel() {
             write("Exception :: ${e.message}")
         }
     }
+
+
+
+    fun getVideoImagePaths(
+        contentResolver: ContentResolver, offset: Int, limit: Int
+    ) {
+
+        val arrayOfMedia = ArrayList<MediaModel>()
+        val uri = MediaStore.Files.getContentUri("external")
+
+        val projection = arrayOf(
+            MediaStore.Files.FileColumns._ID,
+            MediaStore.Files.FileColumns.DATA,
+            MediaStore.Files.FileColumns.DISPLAY_NAME,
+            MediaStore.Files.FileColumns.MIME_TYPE,
+            MediaStore.Files.FileColumns.DATE_ADDED
+        )
+
+//        val selectionBuilder = StringBuilder("${MediaStore.Images.Media.SIZE} > 0")
+
+        val selection = "${MediaStore.Files.FileColumns.MEDIA_TYPE}=? OR ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?"
+
+//        selectionBuilder.append("$selection1")
+        val selectionArgs = arrayOf(
+            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
+            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
+        )
+
+
+
+
+
+        Log.d("developer","${selectionArgs.toString()}")
+
+
+
+        // Add selection to filter out invalid images
+//        val selection = "${MediaStore.Images.Media.SIZE} > 0"
+//        val selection = selectionBuilder.toString()
+
+
+        // Sort by date, but remove the LIMIT/OFFSET
+        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
+
+        try {
+            contentResolver.query(
+                uri, projection, selection, if (selectionArgs.isEmpty()) null else selectionArgs, sortOrder
+            )?.use { cursor ->
+
+                Log.e("developer", "cursor.count :: ${cursor.count}")
+
+                liveOfTotalPage.tryEmit(cursor.count)
+
+                val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)
+                val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)
+                val mimeTypeColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MIME_TYPE)
+
+                val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)
+
+
+                val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)
+
+
+
+
+                // Move to the offset position
+                if (offset > 0) {
+                    cursor.moveToPosition(offset - 1)
+                }
+
+                var count = 0
+                // Only process 'limit' number of items
+                while (cursor.moveToNext() && count < limit) {
+                    val imageId = cursor.getLong(idColumn)
+                    val filePath = cursor.getString(dataColumn)
+                    arrayOfMedia.add(
+                        MediaModel(
+                            imageId.toString(), filePath
+                        )
+                    )
+                    count++
+                }
+            }
+
+            if (arrayOfMedia.isNotEmpty()) {
+
+                if (liveOfArrayOfMedia.value.isNullOrEmpty()) {
+                    liveOfArrayOfMedia.value = arrayOfMedia
+                } else {
+
+//                    val arrayOf = liveOfArrayOfMedia.value
+//                    liveOfArrayOfMedia.value = arrayOfMedia
+
+                    val arrayOf = ArrayList<MediaModel>()
+                    liveOfArrayOfMedia.value?.forEach {
+                        arrayOf.add(it.copy())
+                    }
+
+                    arrayOfMedia.forEach {
+                        arrayOf.add(it.copy())
+                    }
+
+                    liveOfArrayOfMedia.value = arrayOf
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            write("Exception :: ${e.message}")
+        }
+    }
+
+
+
 
 
     fun getPDFFiles2(

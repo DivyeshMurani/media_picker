@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    private val scope = CoroutineScope(Dispatchers.Main + Job())
+        private val scope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,8 +38,9 @@ class MainActivity : AppCompatActivity() {
         scope.launch {
             val item =
                 MediaPicker.Builder(this@MainActivity)
-                    .setMediaType(MediaPicker.MediaType.VIDEO)
+                    .setMediaType(MediaPicker.MediaType.ALL)
                     .enableMultiSelect()
+                    .setMediaExtension(MediaPicker.MediaExtension.ALL)
                     .setMaxItems(5)
                     .pickMedia()
 

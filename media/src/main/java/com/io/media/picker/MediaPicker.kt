@@ -14,7 +14,7 @@ class MediaPicker private constructor(private val builder: Builder) {
     private fun start() {
 
         val intent = Intent(builder.mContext, MediaActivity::class.java)
-        intent.putExtra("data",builder.config)
+        intent.putExtra("data", builder.config)
         builder.mContext.startActivity(intent)
 
     }
@@ -47,6 +47,11 @@ class MediaPicker private constructor(private val builder: Builder) {
         fun setMaxItems(max: Int) = apply {
             this.config = config.copy(maxItems = max)
         }
+
+        fun setMediaExtension(max: MediaExtension) = apply {
+            this.config = config.copy(mediaExtension = max)
+        }
+
         // Add suspend function to get results
         suspend fun pickMedia(): List<MediaModel> {
             build().start()
@@ -64,10 +69,16 @@ class MediaPicker private constructor(private val builder: Builder) {
         val mediaType: MediaType = MediaType.VIDEO,
         val maxItems: Int = Int.MAX_VALUE,
         val enableMultiSelect: Boolean = false,
-        ):Serializable
+        val mediaExtension: MediaExtension = MediaExtension.ALL,
+
+    ) : Serializable
 
     enum class MediaType {
-        VIDEO, IMAGE
+        VIDEO, IMAGE,ALL
+    }
+
+    enum class MediaExtension {
+        JPEG, PNG, ALL
     }
 
     interface MediaCallback {

@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/mConstraintLayout"
         android:layout_width="match_parent"
+        android:id="@+id/mConstraintLayout"
         android:layout_height="wrap_content">
 
         <com.google.android.material.card.MaterialCardView
@@ -58,12 +58,21 @@
 
                     </FrameLayout>
 
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tvVID"
+                        android:layout_width="wrap_content"
+                        android:text="VID"
+                        android:layout_marginBottom="10dp"
+                        android:textSize="15sp"
+                        android:textColor="@color/black"
+                        android:layout_gravity="bottom|center"
+                        android:layout_height="wrap_content"/>
 
                 </FrameLayout>
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-            >
+
 
 
         </com.google.android.material.card.MaterialCardView>

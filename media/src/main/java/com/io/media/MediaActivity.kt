@@ -5,11 +5,9 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.view.WindowInsets
-import android.view.WindowInsetsController
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -36,11 +34,6 @@ import com.io.media.viewmodel.MediaViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -83,6 +76,27 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
             mediaConfig = intent.getSerializableExtra("data") as MediaPicker.MediaConfig
         }
         viewModel.mediaMaxSelect = mediaConfig?.maxItems ?: 1
+        Log.d("developer", "mediaConfig?.mediaExtension ${mediaConfig?.mediaExtension}")
+
+        when (mediaConfig?.mediaExtension) {
+            MediaPicker.MediaExtension.JPEG -> {
+                viewModel.mediaExtension = "jpg"
+
+            }
+
+            MediaPicker.MediaExtension.PNG -> {
+                viewModel.mediaExtension = "png"
+
+            }
+
+            MediaPicker.MediaExtension.ALL -> {
+                viewModel.mediaExtension = ""
+            }
+
+            else -> {
+
+            }
+        }
     }
 
     private fun initClickEvent() {
@@ -97,7 +111,7 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1)
-            }else{
+            } else {
                 initLoadMedia()
 
             }
@@ -113,7 +127,7 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
                         android.Manifest.permission.READ_MEDIA_VIDEO
                     ), 1
                 )
-            }else{
+            } else {
                 initLoadMedia()
             }
         }
@@ -213,9 +227,18 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
                 viewModel.getImagesWithPaths(
                     contentResolver,
                     paginationState.currentPage * paginationState.itemsPerPage,
+                    paginationState.itemsPerPage, format = viewModel.mediaExtension
+                )
+            }
+
+            MediaType.ALL -> {
+                viewModel.getVideoImagePaths(
+                    contentResolver,
+                    paginationState.currentPage * paginationState.itemsPerPage,
                     paginationState.itemsPerPage
                 )
             }
+
             null -> {
             }
         }
@@ -276,8 +299,10 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
                 val bundle = payloads?.get(0) as Bundle
                 if (bundle.getString("hasSelected") == "hasSelected") {
                     if (item.hasSelected == 1) {
-                        binding.mFrameOfSelection.visibility = View.VISIBLE
+                        binding.mConstraintLayout.alpha = 0.5F
+                        binding.mFrameOfSelection.visibility = View.GONE
                     } else {
+                        binding.mConstraintLayout.alpha = 1.0F
                         binding.mFrameOfSelection.visibility = View.GONE
                     }
                     return
@@ -299,10 +324,34 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
                         val i = Intent(this@MediaActivity, MediaPlayerActivity::class.java)
                         i.putExtra("url", item.path)
                         startActivity(i)
+                    } else if (mediaConfig?.mediaType == MediaType.ALL) {
+
+                        if (item.path?.contains("mp4") == true) {
+                            val i = Intent(this@MediaActivity, MediaPlayerActivity::class.java)
+                            i.putExtra("url", item.path)
+                            startActivity(i)
+                        }
                     }
 
                     return@setOnLongClickListener true
                 }
+
+                binding.tvVID.visibility= View.GONE
+                if (mediaConfig?.mediaType == MediaType.VIDEO) {
+                    binding.tvVID.visibility= View.VISIBLE
+
+
+                } else if (mediaConfig?.mediaType == MediaType.ALL) {
+
+                    if (item.path?.contains("mp4") == true) {
+                      binding.tvVID.visibility= View.VISIBLE
+                    }
+                }
+
+
+
+
+
 
                 if (item.hasSelected == 1) {
                     binding.mFrameOfSelection.visibility = View.VISIBLE
@@ -350,7 +399,7 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
         if (requestCode == 1) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 initLoadMedia()
-            }else{
+            } else {
 
                 Toast.makeText(this@MediaActivity, "Permission denied", Toast.LENGTH_SHORT).show()
                 finish()
