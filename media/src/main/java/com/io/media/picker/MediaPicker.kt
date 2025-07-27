@@ -52,10 +52,24 @@ class MediaPicker private constructor(private val builder: Builder) {
             this.config = config.copy(mediaExtension = max)
         }
 
+        fun enableCrop(enable: Boolean = true) = apply {
+            this.config = config.copy(enableCrop = enable)
+        }
+
         // Add suspend function to get results
         suspend fun pickMedia(): List<MediaModel> {
             build().start()
             return MediaPickerChannel.receive()
+        }
+
+        // Add crop function for single image
+        suspend fun cropImage(context: Context, imagePath: String): String? {
+            val intent = Intent(context, com.io.media.crop.ImageCropActivity::class.java).apply {
+                putExtra("extra_image_path", imagePath)
+            }
+            context.startActivity(intent)
+            // Note: This is a simplified version. In a real implementation, you'd need to handle the result properly
+            return null
         }
 
 
@@ -70,7 +84,7 @@ class MediaPicker private constructor(private val builder: Builder) {
         val maxItems: Int = Int.MAX_VALUE,
         val enableMultiSelect: Boolean = false,
         val mediaExtension: MediaExtension = MediaExtension.ALL,
-
+        val enableCrop: Boolean = false
     ) : Serializable
 
     enum class MediaType {

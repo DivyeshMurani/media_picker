@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black">
+
+        <!-- Top Toolbar -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/ic_close"
+            app:title="Crop Image"
+            app:titleTextColor="@android:color/white" />
+
+        <!-- Crop View Container -->
+        <FrameLayout
+            android:id="@+id/cropContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/controlsContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+            <com.io.media.crop.CropImageView
+                android:id="@+id/cropImageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </FrameLayout>
+
+        <!-- Controls Container -->
+        <LinearLayout
+            android:id="@+id/controlsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_controls"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- Aspect Ratio Controls -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="Aspect Ratio:"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+                <RadioGroup
+                    android:id="@+id/aspectRatioGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/btnFree"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:buttonTint="@android:color/white"
+                        android:text="Free"
+                        android:textColor="@android:color/white" />
+
+                    <RadioButton
+                        android:id="@+id/btnSquare"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:buttonTint="@android:color/white"
+                        android:text="1:1"
+                        android:textColor="@android:color/white" />
+
+                    <RadioButton
+                        android:id="@+id/btn16x9"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:buttonTint="@android:color/white"
+                        android:text="16:9"
+                        android:textColor="@android:color/white" />
+
+                    <RadioButton
+                        android:id="@+id/btn4x3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@android:color/white"
+                        android:text="4:3"
+                        android:textColor="@android:color/white" />
+
+                </RadioGroup>
+            </LinearLayout>
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnReset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/bg_button_secondary"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:text="Reset"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:visibility="gone"
+                    android:id="@+id/btnRotate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/bg_button_secondary"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:text="Rotate"
+                    android:textColor="@android:color/white" />
+
+                <Button
+
+                    android:id="@+id/btnCrop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_button_primary"
+                    android:paddingStart="32dp"
+                    android:paddingEnd="32dp"
+                    android:text="Crop"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

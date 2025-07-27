@@ -18,6 +18,11 @@
         <activity
             android:name=".MediaPlayerActivity"
             android:exported="true" />
+
+        <activity
+            android:name=".crop.ImageCropActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
     </application>
 
 </manifest>

@@ -45,7 +45,7 @@ android {
 dependencies {
 
 
-    implementation(project(":media"))
+    api(project(":media"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

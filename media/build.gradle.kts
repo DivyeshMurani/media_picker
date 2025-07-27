@@ -49,7 +49,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("androidx.fragment:fragment-ktx:1.8.5")
-    implementation (libs.glide)
+    api(libs.glide)
 
 
     implementation("androidx.media3:media3-exoplayer:1.3.0")

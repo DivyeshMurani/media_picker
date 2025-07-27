@@ -2,6 +2,7 @@ package com.io.media
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
@@ -20,6 +22,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.io.media.base.BaseActivity
 import com.io.media.base.BaseListAdapter
+import com.io.media.crop.ImageCropActivity
 import com.io.media.databinding.ActivityMediaBinding
 import com.io.media.databinding.ItemImageBinding
 import com.io.media.model.MediaModel
@@ -295,15 +298,18 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
             binding: ItemImageBinding, item: MediaModel, indexOf: Int, payloads: MutableList<Any>?
         ) {
 
+            binding.mFrameOfSelection.visibility = View.GONE
+
             if (payloads.isNullOrEmpty().not()) {
                 val bundle = payloads?.get(0) as Bundle
                 if (bundle.getString("hasSelected") == "hasSelected") {
                     if (item.hasSelected == 1) {
-                        binding.mConstraintLayout.alpha = 0.5F
+                        binding.mConstraintLayout.alpha = 0.3F
                         binding.mFrameOfSelection.visibility = View.GONE
                     } else {
                         binding.mConstraintLayout.alpha = 1.0F
                         binding.mFrameOfSelection.visibility = View.GONE
+
                     }
                     return
                 }
@@ -331,6 +337,11 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
                             i.putExtra("url", item.path)
                             startActivity(i)
                         }
+                    } else if (mediaConfig?.mediaType == MediaType.IMAGE) {
+                        // Show crop option for images if enabled
+                        if (mediaConfig?.enableCrop == true) {
+                            showCropDialog(item.path)
+                        }
                     }
 
                     return@setOnLongClickListener true
@@ -348,15 +359,10 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
                     }
                 }
 
-
-
-
-
-
                 if (item.hasSelected == 1) {
-                    binding.mFrameOfSelection.visibility = View.VISIBLE
+                    binding.mConstraintLayout.alpha = 0.3F
                 } else {
-                    binding.mFrameOfSelection.visibility = View.GONE
+                    binding.mConstraintLayout.alpha = 1.0F
                 }
 
                 Glide.with(this@MediaActivity).load(item.path)
@@ -408,6 +414,40 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>() {
         }
 
 
+    }
+
+    private fun showCropDialog(imagePath: String?) {
+        imagePath?.let { path ->
+            AlertDialog.Builder(this)
+                .setTitle("Image Options")
+                .setItems(arrayOf("Crop Image", "Cancel")) { _, which ->
+                    when (which) {
+                        0 -> {
+                            // Start crop activity
+                            val intent = Intent(this, ImageCropActivity::class.java).apply {
+                                putExtra("extra_image_path", path)
+                            }
+                            startActivityForResult(intent, ImageCropActivity.CROP_REQUEST_CODE)
+                        }
+                    }
+                }
+                .show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        
+        if (requestCode == ImageCropActivity.CROP_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                data?.getStringExtra("extra_cropped_image_path")?.let { croppedPath ->
+                    // Handle the cropped image path
+                    Toast.makeText(this, "Image cropped successfully!", Toast.LENGTH_SHORT).show()
+                    // You can add the cropped image to your selection or handle it as needed
+                    Log.d("Crop", "Cropped image saved at: $croppedPath")
+                }
+            }
+        }
     }
 
     override fun onDestroy() {
