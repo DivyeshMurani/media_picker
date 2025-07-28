@@ -37,3 +37,18 @@ A lightweight and easy-to-use Android library for selecting images and videos (s
         }
 
     }
+
+Image Crop
+
+      ImageCropActivity.start(
+                this@MainActivity,
+                path)
+
+      override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == ImageCropActivity.CROP_REQUEST_CODE && resultCode == RESULT_OK) {
+            val croppedImagePath = data?.getStringExtra(ImageCropActivity.EXTRA_CROPPED_IMAGE_PATH)
+
+            Glide.with(this@MainActivity).load(croppedImagePath).into(findViewById(R.id.aci))
+        }
+    }
